@@ -1,0 +1,8 @@
+{
+  "name": "klikker",
+  "version": "0.0.1",
+  "description": "Lightweight web-based clicker",
+  "scripts": {
+    "start": "npx serve src"
+  }
+}

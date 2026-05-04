@@ -1,0 +1,62 @@
+:root {
+    --bg: #121212;
+    --text: #ffffff;
+    --btn-bg: #333;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    height: 100%;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: sans-serif;
+    overflow: hidden;
+}
+
+#app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 10px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    flex-grow: 1;
+}
+
+.counter-btn {
+    border: none;
+    border-radius: 12px;
+    background: var(--btn-bg);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s ease-out;
+}
+
+.counter-btn:active {
+    transform: scale(0.95);
+}
+
+.counter-label {
+    font-size: 34px;
+}
+
+.counter-value {
+    font-size: 24px;
+    opacity: 0.8;
+    margin-top: 4px;
+}
