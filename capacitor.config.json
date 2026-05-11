@@ -1,0 +1,8 @@
+{
+  "appId": "derVedro.klikker",
+  "appName": "klikker",
+  "webDir": "src",
+  "android": {
+    "minSdkVersion": 24
+  }
+}

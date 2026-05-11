@@ -1,8 +1,11 @@
 {
   "name": "klikker",
-  "version": "0.0.2",
-  "description": "Lightweight web-based clicker",
-  "scripts": {
-    "start": "npx serve src"
+  "version": "0.1.0",
+  "description": "Lightweight android clicker app",
+  "dependencies": {
+    "@capacitor/android": "^8.3.3",
+    "@capacitor/app": "^8.1.0",
+    "@capacitor/core": "^8.3.3",
+    "@capacitor/cli": "^8.3.3"
   }
 }
