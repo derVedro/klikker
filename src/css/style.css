@@ -2,6 +2,11 @@
     --bg: #121212;
     --text: #ffffff;
     --ctrl-bg: #333;
+    --row-bg: #333;
+    --modal-bg: rgba(0, 0, 0, 0.9);
+    --content-bg: #222;
+    --input-bg: #444;
+    --input-text: #ffffff;
     --flash: #ffffff;
 }
 
@@ -11,6 +16,11 @@
     padding: 0;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+}
+
+input {
+    -webkit-user-select: text !important;
+    user-select: text !important;
 }
 
 html, body {
@@ -113,7 +123,7 @@ html, body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8);
+    background: var(--modal-bg);
     z-index: 1000;
     display: flex;
     align-items: center;
@@ -125,12 +135,84 @@ html, body {
 }
 
 .modal-content {
-    background: #222;
+    background: var(--content-bg);
     padding: 15px;
     width: 100%;
     height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.modal-content h2 {
+    margin: 0 0 15px 0;
+    text-align: center;
+}
+
+#settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-grow: 1;
+}
+
+.config-row {
+    background: var(--row-bg);
+    padding: 8px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.config-row input[type="text"] {
+    flex: 1;
+    min-width: 60px;
+    padding: 8px;
+    border-radius: 4px;
+    border: none;
+    font-size: 16px;
+    background: var(--input-bg);
+    color: var(--input-text);
+}
+
+.delete-btn {
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    font-size: 30px;
+    background: #f44336;
     color: #fff;
+    border: none;
+    border-radius: 8px;
+    margin-left: auto;
     display: flex;
     align-items: center;
     justify-content: center;
+    line-height: 1;
+}
+
+.action-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #fff;
+    margin-top: 5px;
+}
+
+.action-btn.add {
+    background: #8250df;
+}
+
+.action-btn.reset {
+    background: #ff9800;
+}
+
+.action-btn.close {
+    background: #555;
 }
