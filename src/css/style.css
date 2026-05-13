@@ -10,6 +10,18 @@
     --flash: #ffffff;
 }
 
+body.light-mode {
+    --bg: #f5f5f5;
+    --text: #121212;
+    --ctrl-bg: #e0e0e0;
+    --row-bg: #e0e0e0;
+    --modal-bg: rgba(245, 245, 245, 0.95);
+    --content-bg: #ffffff;
+    --input-bg: #dddddd;
+    --input-text: #121212;
+    --flash: #000000;
+}
+
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
@@ -30,6 +42,7 @@ html, body {
     font-family: sans-serif;
     overflow: hidden;
     overscroll-behavior: none;
+    transition: background-color 0.2s, color 0.2s;
 }
 
 #app-container {
@@ -128,6 +141,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background-color 0.2s;
 }
 
 .modal.hidden {
@@ -143,6 +157,7 @@ html, body {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    transition: background-color 0.2s;
 }
 
 .modal-content h2 {
@@ -164,6 +179,7 @@ html, body {
     display: flex;
     align-items: center;
     gap: 8px;
+    transition: background-color 0.2s;
 }
 
 .config-row input[type="text"] {
@@ -215,4 +231,78 @@ html, body {
 
 .action-btn.close {
     background: #555;
+}
+
+.color-picker-content {
+    max-width: 300px;
+    height: auto;
+    margin: 0 auto;
+}
+
+.color-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.color-option {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.color-option.selected {
+    border-color: #fff;
+    transform: scale(1.1);
+}
+
+.toggle-switch {
+    position: relative;
+    width: 50px;
+    height: 28px;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #555;
+    border-radius: 28px;
+    transition: .2s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: #fff;
+    border-radius: 50%;
+    transition: .2s;
+}
+
+input:checked + .slider {
+    background-color: #8250df;
+}
+
+input:checked + .slider:before {
+    transform: translateX(22px);
 }

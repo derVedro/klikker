@@ -1,4 +1,6 @@
 const STORAGE_KEY = 'klikker_data';
+const PREFS_KEY = 'klikker_prefs';
+const DEFAULT_PREFS = {darkMode: true, vibration: true};
 const COLORS = [
     '#D4AF37', '#FF007F', '#0000FF', '#556B2F',
     '#8B0000', '#9932CC', '#FF4500', '#00CED1',
@@ -14,14 +16,31 @@ const DEFAULT_DATA = [
     {id: 6, label: 'F', value: 0, color: COLORS[5]},
 ];
 let counters = [];
+let prefs = {...DEFAULT_PREFS};
 let longPressTimer = null;
 let isLongPressDetected = false;
+let currentColorTarget = null;
 
 document.addEventListener('DOMContentLoaded', () => {
+    loadPrefs();
     loadState();
     renderGrid();
     setupListeners();
 });
+
+function loadPrefs() {
+    const stored = localStorage.getItem(PREFS_KEY);
+    prefs = stored ? {...DEFAULT_PREFS, ...JSON.parse(stored)} : {...DEFAULT_PREFS};
+    applyTheme();
+}
+
+function savePrefs() {
+    localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+}
+
+function applyTheme() {
+    document.body.classList.toggle('light-mode', !prefs.darkMode);
+}
 
 function loadState() {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -35,7 +54,7 @@ function saveState() {
 function triggerFlash() {
     const overlay = document.getElementById('flash-overlay');
     overlay.classList.add('active');
-    if (navigator.vibrate) navigator.vibrate(50);
+    if (prefs.vibration && navigator.vibrate) navigator.vibrate(50);
     setTimeout(() => overlay.classList.remove('active'), 100);
 }
 
@@ -96,15 +115,70 @@ function toggleSettings(show) {
     }
 }
 
+function openColorPicker(counterId) {
+    currentColorTarget = counters.find(c => c.id === counterId);
+    const grid = document.getElementById('color-grid');
+    grid.innerHTML = '';
+    COLORS.forEach(color => {
+        const div = document.createElement('div');
+        div.className = 'color-option';
+        div.style.backgroundColor = color;
+        if (currentColorTarget.color === color) div.classList.add('selected');
+        div.addEventListener('click', () => {
+            currentColorTarget.color = color;
+            saveState();
+            renderGrid();
+            renderSettings();
+            document.getElementById('color-picker-modal').classList.add('hidden');
+        });
+        grid.appendChild(div);
+    });
+    document.getElementById('color-picker-modal').classList.remove('hidden');
+}
+
 function renderSettings() {
     const list = document.getElementById('settings-list');
     list.innerHTML = '';
+    const prefsContainer = document.createElement('div');
+    prefsContainer.style.cssText = 'display:flex; flex-direction:column; gap:8px; margin-bottom:10px;';
+    [['Dark Mode', 'darkMode'], ['Vibration', 'vibration']].forEach(([label, key]) => {
+        const row = document.createElement('div');
+        row.className = 'config-row';
+        row.style.justifyContent = 'space-between';
+        const labelSpan = document.createElement('span');
+        labelSpan.textContent = label;
+        labelSpan.style.flex = '1';
+        const toggleLabel = document.createElement('label');
+        toggleLabel.className = 'toggle-switch';
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = prefs[key];
+        const slider = document.createElement('span');
+        slider.className = 'slider';
+        checkbox.addEventListener('change', (e) => {
+            prefs[key] = e.target.checked;
+            savePrefs();
+            applyTheme();
+        });
+        toggleLabel.appendChild(checkbox);
+        toggleLabel.appendChild(slider);
+        row.appendChild(labelSpan);
+        row.appendChild(toggleLabel);
+        prefsContainer.appendChild(row);
+    });
+    list.appendChild(prefsContainer);
+
     counters.forEach((counter, index) => {
         const row = document.createElement('div');
         row.className = 'config-row';
+        const colorBtn = document.createElement('div');
+        colorBtn.className = 'color-option';
+        colorBtn.style.cssText = `width: 40px; height: 40px; margin: 0; flex-shrink: 0; background-color: ${counter.color};`;
+        colorBtn.addEventListener('click', () => openColorPicker(counter.id));
         const labelInput = document.createElement('input');
         labelInput.type = 'text';
         labelInput.value = counter.label;
+        labelInput.maxLength = 256;
         labelInput.addEventListener('input', (e) => {
             counter.label = e.target.value;
             saveState();
@@ -121,6 +195,7 @@ function renderSettings() {
                 renderGrid();
             }
         });
+        row.appendChild(colorBtn);
         row.appendChild(labelInput);
         row.appendChild(delBtn);
         list.appendChild(row);
@@ -158,4 +233,7 @@ function renderSettings() {
 function setupListeners() {
     document.getElementById('btn-settings').addEventListener('click', () => toggleSettings(true));
     document.getElementById('btn-share').addEventListener('click', () => alert('Share feature coming soon'));
+    document.getElementById('btn-close-color').addEventListener('click', () => {
+        document.getElementById('color-picker-modal').classList.add('hidden');
+    });
 }
