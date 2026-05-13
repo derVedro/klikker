@@ -1,6 +1,9 @@
 const STORAGE_KEY = 'klikker_data';
 const PREFS_KEY = 'klikker_prefs';
 const DEFAULT_PREFS = {darkMode: true, vibration: true};
+const isCapacitor = typeof Capacitor !== 'undefined';
+const App = isCapacitor ? Capacitor.Plugins.App : null;
+const Share = isCapacitor ? Capacitor.Plugins.Share : null;
 const COLORS = [
     '#D4AF37', '#FF007F', '#0000FF', '#556B2F',
     '#8B0000', '#9932CC', '#FF4500', '#00CED1',
@@ -26,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadState();
     renderGrid();
     setupListeners();
+    setupBackButton();
 });
 
 function loadPrefs() {
@@ -40,6 +44,17 @@ function savePrefs() {
 
 function applyTheme() {
     document.body.classList.toggle('light-mode', !prefs.darkMode);
+}
+
+function setupBackButton() {
+    if (!App) return;
+    App.addListener('backButton', () => {
+        const colorModal = document.getElementById('color-picker-modal');
+        const settingsModal = document.getElementById('modal-settings');
+        if (!colorModal.classList.contains('hidden')) colorModal.classList.add('hidden');
+        else if (!settingsModal.classList.contains('hidden')) toggleSettings(false);
+        else App.exitApp();
+    });
 }
 
 function loadState() {
@@ -205,7 +220,12 @@ function renderSettings() {
     addBtn.className = 'action-btn add';
     addBtn.addEventListener('click', () => {
         const newId = counters.length > 0 ? Math.max(...counters.map(c => c.id)) + 1 : 1;
-        counters.push({id: newId, label: 'NEW', value: 0, color: COLORS[newId % COLORS.length]});
+        counters.push({
+            id: newId,
+            label: 'NEW',
+            value: 0,
+            color: COLORS[newId % COLORS.length]
+        });
         saveState();
         renderSettings();
         renderGrid();
