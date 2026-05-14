@@ -251,8 +251,20 @@ function renderSettings() {
 }
 
 function setupListeners() {
+    document.getElementById('btn-share').addEventListener('click', async () => {
+        const textLines = counters.filter(c => c.value > 0).map(c => `${c.label} : ${c.value}`).join('\n');
+        if (!textLines) return alert('No counters to share.');
+        if (Share) {
+            try {
+                await Share.share({text: textLines});
+            } catch (err) {
+                console.error(err);
+            }
+        } else {
+            navigator.clipboard.writeText(textLines).then(() => alert('Copied to clipboard! (Native Share unavailable)'));
+        }
+    });
     document.getElementById('btn-settings').addEventListener('click', () => toggleSettings(true));
-    document.getElementById('btn-share').addEventListener('click', () => alert('Share feature coming soon'));
     document.getElementById('btn-close-color').addEventListener('click', () => {
         document.getElementById('color-picker-modal').classList.add('hidden');
     });
