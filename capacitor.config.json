@@ -2,6 +2,11 @@
   "appId": "derVedro.klikker",
   "appName": "klikker",
   "webDir": "src",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
   "android": {
     "minSdkVersion": 24
   }
