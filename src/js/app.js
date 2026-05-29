@@ -23,6 +23,7 @@ let prefs = {...DEFAULT_PREFS};
 let longPressTimer = null;
 let isLongPressDetected = false;
 let currentColorTarget = null;
+let activeButton = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     loadPrefs();
@@ -89,8 +90,25 @@ function renderGrid() {
             counter.value++;
             saveState();
             btn.querySelector('.counter-value').innerText = counter.value;
-            btn.classList.add('tap-swell');
-            setTimeout(() => btn.classList.remove('tap-swell'), 100);
+            if (activeButton && activeButton !== btn) {
+                activeButton.classList.remove('tap-swell', 'active-layer');
+                activeButton.style.zIndex = '';
+                clearTimeout(activeButton._t);
+                clearTimeout(activeButton._z);
+            }
+            clearTimeout(btn._t);
+            clearTimeout(btn._z);
+            btn.style.zIndex = '1';
+            btn.classList.add('tap-swell', 'active-layer');
+            activeButton = btn;
+            btn._t = setTimeout(() => btn.classList.remove('tap-swell'), 100);
+            btn._z = setTimeout(() => requestAnimationFrame(() => {
+                if (activeButton === btn) {
+                    btn.classList.remove('tap-swell', 'active-layer');
+                    btn.style.zIndex = '';
+                    activeButton = null;
+                }
+            }), 350);
         });
         btn.addEventListener('mousedown', () => startLongPress(btn, counter));
         btn.addEventListener('touchstart', () => startLongPress(btn, counter), {passive: true});

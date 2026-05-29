@@ -73,6 +73,11 @@ html, body {
     position: relative;
     overflow: hidden;
     text-align: center;
+    will-change: auto;
+}
+
+.counter-btn.active-layer {
+    will-change: transform;
 }
 
 .counter-btn.tap-swell {
