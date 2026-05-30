@@ -20,8 +20,6 @@ const DEFAULT_DATA = [
 ];
 let counters = [];
 let prefs = {...DEFAULT_PREFS};
-let longPressTimer = null;
-let isLongPressDetected = false;
 let currentColorTarget = null;
 let activeButton = null;
 
@@ -81,61 +79,68 @@ function renderGrid() {
         const btn = document.createElement('button');
         btn.className = 'counter-btn';
         btn.style.backgroundColor = counter.color;
-        btn.innerHTML = `<span class="counter-label">${counter.label}</span><span class="counter-value">${counter.value}</span>`;
-        btn.addEventListener('click', () => {
-            if (isLongPressDetected) {
-                isLongPressDetected = false;
-                return;
-            }
-            counter.value++;
-            saveState();
-            btn.querySelector('.counter-value').innerText = counter.value;
-            if (activeButton && activeButton !== btn) {
-                activeButton.classList.remove('tap-swell', 'active-layer');
-                activeButton.style.zIndex = '';
-                clearTimeout(activeButton._t);
-                clearTimeout(activeButton._z);
-            }
-            clearTimeout(btn._t);
-            clearTimeout(btn._z);
-            btn.style.zIndex = '1';
-            btn.classList.add('tap-swell', 'active-layer');
-            activeButton = btn;
-            btn._t = setTimeout(() => btn.classList.remove('tap-swell'), 100);
-            btn._z = setTimeout(() => requestAnimationFrame(() => {
-                if (activeButton === btn) {
-                    btn.classList.remove('tap-swell', 'active-layer');
-                    btn.style.zIndex = '';
-                    activeButton = null;
+        const valEl = document.createElement('span');
+        valEl.className = 'counter-value';
+        valEl.textContent = counter.value;
+        btn.innerHTML = `<span class="counter-label">${counter.label}</span>`;
+        btn.appendChild(valEl);
+
+        let lpTimer = null;
+        let lpFired = false;
+
+        btn.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            btn.setPointerCapture(e.pointerId);
+            lpFired = false;
+            lpTimer = setTimeout(() => {
+                lpFired = true;
+                if (counter.value > 0) {
+                    btn.classList.add('long-press-active');
+                    counter.value--;
+                    saveState();
+                    valEl.textContent = counter.value;
+                    triggerFlash();
                 }
-            }), 350);
+            }, 400);
         });
-        btn.addEventListener('mousedown', () => startLongPress(btn, counter));
-        btn.addEventListener('touchstart', () => startLongPress(btn, counter), {passive: true});
-        btn.addEventListener('mouseup', () => endLongPress(btn));
-        btn.addEventListener('mouseleave', () => endLongPress(btn));
-        btn.addEventListener('touchend', () => endLongPress(btn));
+
+        const handleRelease = () => {
+            clearTimeout(lpTimer);
+            btn.classList.remove('long-press-active');
+            if (!lpFired) {
+                counter.value++;
+                saveState();
+                valEl.textContent = counter.value;
+                if (activeButton && activeButton !== btn) {
+                    activeButton.classList.remove('tap-swell', 'active-layer');
+                    activeButton.style.zIndex = '';
+                    clearTimeout(activeButton._t);
+                    clearTimeout(activeButton._z);
+                }
+                clearTimeout(btn._t);
+                clearTimeout(btn._z);
+                btn.style.zIndex = '1';
+                btn.classList.add('tap-swell', 'active-layer');
+                activeButton = btn;
+                btn._t = setTimeout(() => btn.classList.remove('tap-swell'), 100);
+                btn._z = setTimeout(() => requestAnimationFrame(() => {
+                    if (activeButton === btn) {
+                        btn.classList.remove('tap-swell', 'active-layer');
+                        btn.style.zIndex = '';
+                        activeButton = null;
+                    }
+                }), 350);
+            }
+        };
+
+        btn.addEventListener('pointerup', handleRelease);
+        btn.addEventListener('pointercancel', handleRelease);
+        btn.addEventListener('pointerleave', () => {
+            clearTimeout(lpTimer);
+            btn.classList.remove('long-press-active');
+        });
         grid.appendChild(btn);
     });
-}
-
-function startLongPress(btn, counter) {
-    isLongPressDetected = false;
-    longPressTimer = setTimeout(() => {
-        isLongPressDetected = true;
-        if (counter.value > 0) {
-            btn.classList.add('long-press-active');
-            counter.value--;
-            saveState();
-            btn.querySelector('.counter-value').innerText = counter.value;
-            triggerFlash();
-        }
-    }, 400);
-}
-
-function endLongPress(btn) {
-    clearTimeout(longPressTimer);
-    if (btn) btn.classList.remove('long-press-active');
 }
 
 function toggleSettings(show) {
