@@ -89,11 +89,17 @@ html, body {
 }
 
 .counter-label {
-    font-size: 34px;
-    align-self: center;
-    white-space: nowrap;
+    font-size: 26px;
+    line-height: 1.2;
+    white-space: normal;
+    text-wrap: balance;
+    overflow-wrap: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
+    align-self: center;
+    padding: 0 8px;
 }
 
 .counter-value {
